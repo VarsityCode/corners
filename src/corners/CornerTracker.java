@@ -18,7 +18,7 @@ public class CornerTracker extends EZPlugin {
     }
 
     public boolean allCornersPlaced() {
-        return corners.size() == 4;
+        return corners.size() == 3;
     }
 
 
@@ -56,7 +56,7 @@ public class CornerTracker extends EZPlugin {
         if (firstCorner.getY() == corner.getY()) {
             return true;
         } else {
-            errorMessage = "Your Y cooridnate must be the same as the first corner placed";
+            errorMessage = "Your Y coordinate must be the same as the first corner placed";
             return false;
         }
     }
@@ -69,10 +69,6 @@ public class CornerTracker extends EZPlugin {
 
         if (corners.size() == 2) {
             if (twoXCoordinatesWouldBeTheSame(potentialCorner) || twoZCoordinatesWouldBeTheSame(potentialCorner)) {
-                cornerWouldBePartOfValidRectangle = true;
-            }
-        } else if (corners.size() == 3) {
-            if (twoXCoordinatesWouldBeTheSame(potentialCorner) && twoZCoordinatesWouldBeTheSame(potentialCorner)) {
                 cornerWouldBePartOfValidRectangle = true;
             }
         }

@@ -54,7 +54,7 @@ public class Corners extends EZPlugin implements PluginListener {
     if (caller instanceof Player) {
       Player player = (Player)caller;
       cornerHashMap.put(player.getName(), new CornerTracker(player));
-      player.chat("Place 4 corners of the same block and the same height");
+      player.chat("Place 3 corners of the same block and the same height");
       player.chat("and a floor will be created to fill the corners.");
     }
   }
@@ -65,50 +65,81 @@ public class Corners extends EZPlugin implements PluginListener {
 
   private void buildFloorFromCorners(Player player) {
    List<Block> corners =  cornerHashMap.get(player.getName()).corners;
-      Block firstCorner = corners.get(0);
-      Block oppositeXCorner = oppositeXCorner(corners, firstCorner);
-      Block oppositeZCorner = oppositeZCorner(corners, firstCorner);
-      // unless firstCorner has the smallest Z value, switch firstCorner with oppositeCorner
-      if (firstCorner.getZ() > oppositeXCorner.getZ()) {
-          Block tempCorner = firstCorner;
-          firstCorner = oppositeXCorner;
-          oppositeXCorner = tempCorner;
-      }
+      Block firstCorner = getFirstCorner(corners);
 
-      for (int x = firstCorner.getX(); x == oppositeZCorner.getX(); x ++) {
-          for (int z = firstCorner.getZ(); z == oppositeXCorner.getZ(); z++) {
-              Block iteratorBlock = player.getWorld().getBlockAt(x, firstCorner.getY(), z);
-              iteratorBlock.setType(firstCorner.getType());
+      for (int x = firstCorner.getX(); x < largestXCoordinate(corners) + 1; x ++) {
+          if (largestZCoordinate(corners) > firstCorner.getZ()){
+              for (int z = firstCorner.getZ(); z != largestZCoordinate(corners) + 1; z++) {
+                  Block iteratorBlock = player.getWorld().getBlockAt(x, firstCorner.getY(), z);
+                  player.getWorld().setBlockAt(iteratorBlock.getLocation(), firstCorner.getType());
+              }
+          } else {
+              for (int z = smallestZCoordinate(corners); z != largestZCoordinate(corners) + 1; z++) {
+                  Block iteratorBlock = player.getWorld().getBlockAt(x, firstCorner.getY(), z);
+                  player.getWorld().setBlockAt(iteratorBlock.getLocation(), firstCorner.getType());
+              }
           }
       }
   }
+
+    private int largestXCoordinate(List<Block> corners){
+        Block largestCorner = corners.get(0);
+        for (int i=0; i < 3; i++) {
+            for (Block b : corners) {
+                if (b.getX() > largestCorner.getX()) {
+                    largestCorner = b;
+                }
+            }
+        }
+
+        return largestCorner.getX();
+    }
+
+    private int smallestZCoordinate(List<Block> corners){
+        Block smallestCorner = corners.get(0);
+        for (int i=0; i < 3; i++) {
+            for (Block b : corners) {
+                if (b.getZ() < smallestCorner.getZ()) {
+                    smallestCorner = b;
+                }
+            }
+        }
+
+        return smallestCorner.getZ();
+    }
+
+    private int largestZCoordinate(List<Block> corners){
+        Block largestCorner = corners.get(0);
+        for (int i=0; i < 3; i++) {
+            for (Block b : corners) {
+                if (b.getZ() > largestCorner.getZ()) {
+                    largestCorner = b;
+                }
+            }
+        }
+
+        return largestCorner.getZ();
+    }
+
+    // return the corner with the smallest X
+    private Block getFirstCorner(List<Block> corners){
+        Block firstCorner = corners.get(0);
+
+        for (int i=0; i < 3; i++) {
+            for (Block b : corners) {
+                if (b.getX() < firstCorner.getX()) {
+                    firstCorner = b;
+                }
+            }
+        }
+        return firstCorner;
+    }
 
   private boolean playerPlacedAllCorners(Player player) {
     CornerTracker cornerTracker = cornerHashMap.get(player.getName());
     return cornerTracker.allCornersPlaced();
   }
 
-    private Block oppositeXCorner(List<Block> corners, Block startingBlock) {
-        Block oppositeCorner = null;
-
-        for (Block corner: corners) {
-            if(corner.getX() == startingBlock.getX()) {
-                oppositeCorner = corner;
-            }
-        }
-        return oppositeCorner;
-    }
-
-    private Block oppositeZCorner(List<Block> corners, Block startingBlock) {
-        Block oppositeCorner = null;
-
-        for (Block corner: corners) {
-            if(corner.getZ() == startingBlock.getZ()) {
-                oppositeCorner = corner;
-            }
-        }
-        return oppositeCorner;
-    }
 
   private void tryToRegisterCorner(BlockPlaceHook event, Player player) {
     Block blockPlaced = event.getBlockPlaced();
