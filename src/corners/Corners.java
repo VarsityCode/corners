@@ -46,6 +46,13 @@ public class Corners extends EZPlugin implements PluginListener {
     }
   }
 
+    @HookHandler
+    public void onBlockDestroy(BlockDestroyHook event) {
+        Player player = event.getPlayer();
+        if (cornerHashMap.containsKey(player.getName())) {
+            tryToRemoveCorner(event, player);
+        }
+    }
   @Command(aliases = { "corners" },
             description = "Quickly build a floor by placing 4 corners and have it fill the square of those corners automagically.",
             permissions = { "" },
@@ -148,4 +155,9 @@ public class Corners extends EZPlugin implements PluginListener {
       event.setCanceled(); // do not allow block to be placed
     }
   }
+
+    private void tryToRemoveCorner(BlockDestroyHook event, Player player) {
+        CornerTracker cornerTracker = cornerHashMap.get(player.getName());
+        cornerTracker.tryToDestroyCorner(player, event.getBlock());
+    }
 }

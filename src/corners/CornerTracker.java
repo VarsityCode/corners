@@ -25,17 +25,24 @@ public class CornerTracker extends EZPlugin {
     public boolean tryToRegisterCorner(Block potentialCorner) {
         if (corners.isEmpty()) {
             corners.add(potentialCorner);
-            player.chat("Corner has been set at " + potentialCorner.getLocation().toString());
+            player.chat("Corner has been set!");
             return true;
         } else {
             if (isValidCorner(potentialCorner)) {
                 corners.add(potentialCorner);
-                player.chat("Corner has been set at " + potentialCorner.getLocation().toString());
+                player.chat("Corner has been set!");
                 return true;
             } else {
                 player.chat(errorMessage);
                 return false;
             }
+        }
+    }
+
+    public void tryToDestroyCorner(Player player, Block block){
+        if (corners.contains(block)){
+            corners.remove(block);
+            player.chat("Corner has been removed. So far, you have placed " + Integer.toString(corners.size()) + " corners.");
         }
     }
 
